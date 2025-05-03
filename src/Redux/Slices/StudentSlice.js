@@ -1,4 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
+import AxiosInstance from "../../Utils/axiosInstance";
 
 const initialState = {
   students: [],
@@ -8,7 +10,14 @@ const initialState = {
 
 export const getAllStudent = createAsyncThunk("/get-students", async () => {
   try {
-  } catch (error) {}
+    const res = await AxiosInstance.get("/students/all?page=1&limit=10");
+    // toast.success(res?.data?.message);
+    // console.log("res", res?.data?.data);
+
+    return res?.data?.data?.students;
+  } catch (error) {
+    toast.error(error?.message);
+  }
 });
 
 export const studentSlice = createSlice({
@@ -25,7 +34,10 @@ export const studentSlice = createSlice({
         state.state = "error";
       })
       .addCase(getAllStudent.fulfilled, (state, action) => {
-        state.students = action.payload;
+        if (action.payload) {
+          state.students = action.payload;
+        }
+
         state.state = "fulfilled";
       });
   },
